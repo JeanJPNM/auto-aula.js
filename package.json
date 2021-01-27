@@ -1,0 +1,29 @@
+{
+  "name": "auto-aula",
+  "version": "0.0.1",
+  "description": "Entra automáticamente em aulas do zoom",
+  "main": "main.js",
+  "scripts": {
+    "start": "ts-node-dev --transpile-only src/main.ts",
+    "build": "tsc",
+    "run": "tsc && node bin/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JeanJPNM/auto-aula-js.git"
+  },
+  "author": "JeanJPNM",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JeanJPNM/auto-aula-js/issues"
+  },
+  "homepage": "https://github.com/JeanJPNM/auto-aula-js#readme",
+  "devDependencies": {
+    "@types/puppeteer": "^5.4.2",
+    "ts-node-dev": "^1.1.1",
+    "typescript": "^4.1.3"
+  },
+  "dependencies": {
+    "puppeteer": "^5.5.0"
+  }
+}
