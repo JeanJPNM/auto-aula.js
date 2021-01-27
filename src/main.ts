@@ -9,17 +9,15 @@ async function main() {
     headless: !isFirstAccess,
     userDataDir: './puppeteerData',
   })
-  console.log('puppeteer aberto')
   const page = await browser.newPage()
-  console.log('página criada')
+  console.log('navegando para objetivo.br')
   await page.goto('https://objetivo.br', {
     timeout: 60000,
   })
-  console.log('navegando para objetivo.br')
+  console.log('fazendo login')
   await login(page)
-  console.log('login feito')
-  await seeClasses(page)
   console.log('entrando nas aulas')
+  await seeClasses(page)
   await scheduleClasses(page)
   await browser.close()
 }

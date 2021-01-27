@@ -36,6 +36,5 @@ class LocalData implements Data {
     this.save()
   }
 }
-console.log('foo')
 const localData = new LocalData()
 export default localData
