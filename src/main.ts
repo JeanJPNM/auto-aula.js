@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer'
 import { login, scheduleClasses, seeClasses } from './actions'
 import localData from './local_data'
-
+import readline from 'readline'
 async function main() {
   const isFirstAccess: boolean = localData.firstAccess
   console.log('iniciando')
@@ -22,3 +22,11 @@ async function main() {
   await browser.close()
 }
 main()
+  .catch(console.error)
+  .finally(() => {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    })
+    rl.question('Pressione qualquer tecla para continuar', () => rl.close())
+  })
