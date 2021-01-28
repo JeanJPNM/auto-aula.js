@@ -40,6 +40,7 @@ export async function scheduleClasses(page: Page) {
       await login(page)
       await seeClasses(page)
     }
+    await page.reload()
     while (true) {
       const link = await page.$('a.link-aula')
       if (link) {
