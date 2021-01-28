@@ -6,7 +6,7 @@ async function main() {
   const isFirstAccess: boolean = localData.firstAccess
   console.log('iniciando')
   const browser = await puppeteer.launch({
-    headless: !isFirstAccess,
+    headless: false,
     userDataDir: './puppeteerData',
   })
   const page = await browser.newPage()
