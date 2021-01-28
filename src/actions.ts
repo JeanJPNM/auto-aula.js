@@ -49,6 +49,10 @@ export async function scheduleClasses(page: Page) {
             timeout: 60000,
           }),
         ])
+        await delay(5000)
+        await page.click('div[role=button]')
+        await delay(2000)
+        await seeClasses(page)
         break
       } else {
         await delay(5000)
