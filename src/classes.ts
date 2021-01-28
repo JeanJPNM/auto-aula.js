@@ -22,4 +22,9 @@ const classes: ScheduledClass[] = [
   new ScheduledClass(11, 5),
   new ScheduledClass(12, 0),
 ]
+// The first class is not accessible at tuesdays and thursdays
+const day = new Date().getDay()
+if (day === 2 || day === 4) {
+  classes.shift()
+}
 export default classes
