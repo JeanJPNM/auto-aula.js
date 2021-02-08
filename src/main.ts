@@ -1,8 +1,11 @@
 import puppeteer, { launch } from 'puppeteer'
-import { login, scheduleClasses, seeClasses } from './actions'
-import localData from './local_data'
+import * as actions from './actions'
+import localData, { dataFolder } from './local_data'
 import readline from 'readline'
-import * as navigation from './navigation'
+import path from 'path'
+// @ts-ignore
+import chromePaths from 'chrome-paths'
+import { delay } from './util'
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -17,11 +20,11 @@ async function main() {
   try {
     const { firstAccess } = localData.get()
     if (firstAccess) {
-      const matricula = await question('Digite sua matrícula: ')
-      const senha = await question('Digite sua senha')
+      const user = await question('Digite sua matrícula: ')
+      const password = await question('Digite sua senha: ')
       localData.setAll({
-        password: senha,
-        user: matricula,
+        password: password,
+        user: user,
       })
     }
     const option = await question(
@@ -29,12 +32,7 @@ async function main() {
     )
     switch (Number(option[0])) {
       case 0:
-        while (true) {
-          try {
-            await watchClasses()
-            break
-          } catch (error) {}
-        }
+        await watchClasses()
         break
       case 1:
         const user: string = await question('Digite novo número de matrícula: ')
@@ -57,24 +55,42 @@ async function watchClasses() {
   console.log('iniciando')
   const browser = await puppeteer.launch({
     headless: false,
-    userDataDir: './puppeteerData',
+    userDataDir: path.join(dataFolder, 'puppeteerData'),
+    executablePath: chromePaths.chrome,
   })
-  try {
-    const page = await browser.newPage()
-    console.log('navegando para objetivo.br')
-    await page.goto('https://objetivo.br', {
-      timeout: 300000,
-    })
-    console.log('fazendo login')
-    await navigation.login(page)
-    console.log('entrando nas aulas')
-    await navigation.seeClasses(page)
-    await navigation.scheduleClasses(page)
-    await browser.close()
-  } catch (error) {
-    console.error(error)
-  } finally {
-    await browser.close()
+  const page = await browser.newPage()
+  while (true) {
+    try {
+      console.log('navegando para objetivo.br')
+      await page.goto('https://objetivo.br', {
+        timeout: 300000,
+      })
+      console.log('fazendo login')
+      await actions.login(page)
+      console.log('entrando nas aulas')
+      await actions.seeClasses(page)
+      await actions.scheduleClasses(page)
+      await browser.close()
+      break
+    } catch (e) {
+      const error = e as Error
+      switch (error.message) {
+        case 'net::ERR_NAME_NOT_RESOLVED at https://objetivo.br':
+          console.log(
+            'Não foi possível acessar http://objetivo.br' +
+              '\nverifique sua conexão com a internet'
+          )
+          break
+        default:
+          console.log('Ocorreu um erro:\n')
+          console.error(error)
+      }
+      for (let i = 5; i > 0; i--) {
+        process.stdout.write(`\rTentando novamente em ${i}`)
+        await delay(1000)
+      }
+      console.log('')
+    }
   }
 }
 main()
