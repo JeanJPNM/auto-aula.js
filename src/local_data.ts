@@ -26,20 +26,23 @@ const defaultData: Data = {
   firstAccess: true,
   lab: currentLab(),
 }
-const dataPath = path.join(process.env.APPDATA ?? './', '/auto-aula/data.json')
+export const dataFolder = path.join(process.env.APPDATA ?? './', 'auto-aula')
+const dataPath = path.join(dataFolder, 'data.json')
 class LocalData {
   private data: Data = defaultData
   constructor() {
     try {
       let text = fs.readFileSync(dataPath, 'utf8')
       Object.assign(this.data, JSON.parse(text))
+      this.set('firstAccess', false)
     } catch (error) {
-      this.setAll({
-        firstAccess: true,
-      })
+      this.set('firstAccess', true)
     }
   }
   private save() {
+    if (!fs.existsSync(dataPath)) {
+      fs.mkdirSync(dataFolder)
+    }
     fs.writeFileSync(dataPath, JSON.stringify(this.data, undefined, 2))
   }
   setAll(data: Partial<Data>) {
