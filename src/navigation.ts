@@ -1,4 +1,4 @@
-import { ElementHandle, Page } from 'puppeteer'
+import { Page } from 'puppeteer'
 import classes from './classes'
 import localData, { LabClass } from './local_data'
 import { delay, waitUntil } from './util'
@@ -24,6 +24,12 @@ export async function seeClasses(page: Page) {
   })
 }
 export async function scheduleClasses(page: Page) {
+  page.on('dialog', async (e, args) => {
+    console.log(e)
+    await e.accept()
+    await delay(500)
+    await seeClasses(page)
+  })
   for (let myClass of classes) {
     console.log(`aula das ${myClass.hours} e ${myClass.minutes}`)
     const now = new Date()
@@ -41,25 +47,23 @@ export async function scheduleClasses(page: Page) {
     while (true) {
       const links = await page.$$('a.link-aula')
       if (links.length > 0) {
-        let link: ElementHandle<Element>
         if (links.length == 1) {
-          link = links[0]
+          await Promise.all([
+            links[0].click(),
+            page.waitForNavigation({
+              timeout: 300000,
+            }),
+          ])
         } else {
           const { lab } = localData.get()
-          link = links[lab]
+          links[lab].click()
           if (lab == LabClass.bio) {
             localData.set('lab', LabClass.info)
           } else {
             localData.set('lab', LabClass.bio)
           }
         }
-        await Promise.all([
-          link.click(),
-          page.waitForNavigation({
-            timeout: 300000,
-          }),
-        ])
-        await page.waitForSelector('div[role=button]')
+        await delay(5000)
         await page.click('div[role=button]')
         await delay(2000)
         await seeClasses(page)

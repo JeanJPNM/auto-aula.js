@@ -1,36 +1,57 @@
 import fs from 'fs'
+import path from 'path'
+export enum LabClass {
+  bio,
+  info,
+}
 interface Data {
   firstAccess: boolean
+  user?: string
+  password?: string
+  lab: LabClass
 }
-class LocalData implements Data {
-  private _firstAccess!: boolean
-  public get firstAccess(): boolean {
-    return this._firstAccess
+function currentLab() {
+  const start = new Date(2021, 1, 6)
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const days = (today.valueOf() - start.valueOf()) / (1000 * 60 * 60 * 24)
+  const weeks = Math.floor(days / 7)
+  if (weeks % 2 == 0) {
+    return LabClass.info
+  } else {
+    return LabClass.bio
   }
-  public set firstAccess(v: boolean) {
-    this._firstAccess = v
-    this.save()
-  }
-
+}
+const defaultData: Data = {
+  firstAccess: true,
+  lab: currentLab(),
+}
+const dataPath = path.join(process.env.APPDATA ?? './', '/auto-aula/data.json')
+class LocalData {
+  private data: Data = defaultData
   constructor() {
     try {
-      let data = fs.readFileSync('data.json', 'utf8')
-      Object.assign(this, JSON.parse(data))
-      this._firstAccess = false
+      let text = fs.readFileSync(dataPath, 'utf8')
+      Object.assign(this.data, JSON.parse(text))
     } catch (error) {
-      this.writeAll({
+      this.setAll({
         firstAccess: true,
       })
     }
   }
-
   private save() {
-    let data: Data = this
-    fs.writeFileSync('data.json', JSON.stringify(data, undefined, 2))
+    fs.writeFileSync(dataPath, JSON.stringify(this.data, undefined, 2))
   }
-  writeAll(data: Partial<Data>) {
-    Object.assign(this, data)
+  setAll(data: Partial<Data>) {
+    Object.assign(this.data, data)
     this.save()
+  }
+  set<K extends keyof Data>(key: K, value: Data[K]) {
+    this.data[key] = value
+    this.save()
+  }
+  get(): Data {
+    return { ...this.data }
   }
   dispose() {
     this.save()

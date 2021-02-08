@@ -1,3 +1,8 @@
+import { ElementHandle, Page } from 'puppeteer'
+import { seeClasses } from './actions'
+import localData, { LabClass } from './local_data'
+import { delay, waitUntil } from './util'
+
 class ScheduledClass {
   start: Date
   end: Date
