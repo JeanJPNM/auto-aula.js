@@ -1,4 +1,4 @@
-import puppeteer, { launch } from 'puppeteer'
+import puppeteer, { errors, launch } from 'puppeteer'
 import * as actions from './actions'
 import localData, { dataFolder } from './local_data'
 import readline from 'readline'
@@ -73,23 +73,34 @@ async function watchClasses() {
       await browser.close()
       break
     } catch (e) {
-      const error = e as Error
-      switch (error.message) {
-        case 'net::ERR_NAME_NOT_RESOLVED at https://objetivo.br':
-          console.log(
-            'Não foi possível acessar http://objetivo.br' +
-              '\nverifique sua conexão com a internet'
-          )
-          break
-        case 'net::ERR_CONNECTION_TIMED_OUT at https://objetivo.br':
-          console.log('https://objetivo.br demorou demais para responder')
-          break
-        case 'net::ERR_NETWORK_CHANGED at https://objetivo.br':
-          console.log('Houve uma alteração na rede')
-          break
-        default:
-          console.log('Ocorreu um erro:\n')
-          console.error(error)
+      const { message } = e as Error
+      const errors = new Map<RegExp, string | (() => void)>([
+        [
+          /net::ERR_NAME_NOT_RESOLVED/,
+          'Não foi possível acessar o site, verifique sua conexão com a internet',
+        ],
+        [
+          /net::ERR_CONNECTION_TIMED_OUT|TimeoutError/,
+          'O site demorou demais para responder',
+        ],
+        [/net::ERR_NETWORK_CHANGED/, 'Houve uma alteração na rede'],
+      ])
+      // if the error is known, the user receives a custom message,
+      // else show the raw error is shown to the user
+      let knownError: boolean = false
+      for (const [regex, value] of errors) {
+        if (message.match(regex)) {
+          if (typeof value == 'string') {
+            console.log(value)
+          } else {
+            value()
+          }
+          knownError = true
+        }
+      }
+      if (!knownError) {
+        console.log('Ocorreu um erro:\n')
+        console.error(e)
       }
       for (let i = 5; i > 0; i--) {
         process.stdout.write(`\rTentando novamente em ${i}`)
