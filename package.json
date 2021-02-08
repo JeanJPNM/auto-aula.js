@@ -6,7 +6,8 @@
   "scripts": {
     "start": "ts-node-dev --transpile-only src/main.ts",
     "build": "rimraf bin && tsc",
-    "run": "tsc && node bin/main.js"
+    "run": "tsc && node bin/main.js",
+    "compile": "npm run build && nexe bin/main.js -o build/auto-aula && nexe bin/main.js -t win32-x86 -o build/auto-aula-x86"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
+    "chrome-paths": "^1.0.1",
     "puppeteer": "^5.5.0"
   }
 }
