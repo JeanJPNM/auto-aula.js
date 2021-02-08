@@ -84,6 +84,9 @@ async function watchClasses() {
         case 'net::ERR_CONNECTION_TIMED_OUT at https://objetivo.br':
           console.log('https://objetivo.br demorou demais para responder')
           break
+        case 'net::ERR_NETWORK_CHANGED at https://objetivo.br':
+          console.log('Houve uma alteração na rede')
+          break
         default:
           console.log('Ocorreu um erro:\n')
           console.error(error)
