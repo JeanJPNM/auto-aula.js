@@ -81,6 +81,9 @@ async function watchClasses() {
               '\nverifique sua conexão com a internet'
           )
           break
+        case 'net::ERR_CONNECTION_TIMED_OUT at https://objetivo.br':
+          console.log('https://objetivo.br demorou demais para responder')
+          break
         default:
           console.log('Ocorreu um erro:\n')
           console.error(error)
