@@ -57,6 +57,7 @@ async function watchClasses() {
     headless: false,
     userDataDir: path.join(dataFolder, 'puppeteerData'),
     executablePath: chromePaths.chrome,
+    defaultViewport: null,
   })
   const page = await browser.newPage()
   while (true) {
