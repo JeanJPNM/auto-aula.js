@@ -61,7 +61,7 @@ export async function scheduleClasses(page: Page) {
         ])
         await page.waitForSelector('div[role=button]')
         await page.click('div[role=button]')
-        await delay(2000)
+        await delay(10000)
         await seeClasses(page)
         break
       } else {
