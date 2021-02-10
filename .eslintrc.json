@@ -15,6 +15,7 @@
   },
   "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
+    "@typescript-eslint/no-extra-semi": ["off"],
     "eqeqeq": "error",
     "func-style": ["error", "declaration"],
     "linebreak-style": ["error", "windows"],
