@@ -11,7 +11,7 @@ interface Data {
   lab: LabClass
 }
 function currentLab() {
-  const start = new Date(2021, 1, 6)
+  const start = new Date(2021, 1, 2)
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const days = (today.valueOf() - start.valueOf()) / (1000 * 60 * 60 * 24)
