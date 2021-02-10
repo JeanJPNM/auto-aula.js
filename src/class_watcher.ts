@@ -74,7 +74,11 @@ export default class ClassWatcher {
 
   private async resetAll(): Promise<void> {
     await this.browser?.close()
+<<<<<<< HEAD
     await this.launch()
+=======
+    await this.init()
+>>>>>>> 5052209f949c8d9095a28928b7daca94b4c2079b
   }
 
   private notifyListeners(error: Error, payload: ErrorCase) {
