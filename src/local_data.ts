@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { holidays } from './dates'
 export enum LabClass {
   bio,
   info,
@@ -15,7 +16,12 @@ function currentLab() {
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const days = (today.valueOf() - start.valueOf()) / (1000 * 60 * 60 * 24)
-  const weeks = Math.floor(days / 7)
+  const weeks =
+    Math.floor(days / 7) -
+    holidays.filter((date) => {
+      const day = date.getDay()
+      return (day == 2 || day == 4) && date < now
+    }).length
   if (weeks % 2 == 0) {
     return LabClass.info
   } else {
