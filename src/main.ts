@@ -1,16 +1,16 @@
-import * as actions from './actions'
 import localData, { dataFolder } from './local_data'
+import ClassWatcher from './class_watcher'
+import { LaunchOptions } from 'puppeteer'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import chromePaths from 'chrome-paths'
-import { delay } from './util'
 import path from 'path'
-import puppeteer from 'puppeteer'
 import readline from 'readline'
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 })
+
 async function question(query: string): Promise<string> {
   const answer: string = await new Promise((resolve) =>
     rl.question(query, resolve)
@@ -24,8 +24,8 @@ async function main() {
       const user = await question('Digite sua matrícula: ')
       const password = await question('Digite sua senha: ')
       localData.setAll({
-        password: password,
-        user: user,
+        password,
+        user,
       })
     }
     const option = await question(
@@ -55,63 +55,35 @@ async function main() {
 }
 async function watchClasses() {
   console.log('iniciando')
-  const browser = await puppeteer.launch({
+  const launchOptions: LaunchOptions = {
     headless: false,
     userDataDir: path.join(dataFolder, 'puppeteerData'),
     executablePath: chromePaths.chrome,
     defaultViewport: null,
-  })
-  const page = await browser.newPage()
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    try {
-      console.log('navegando para objetivo.br')
-      await page.goto('https://objetivo.br', {
-        timeout: 300000,
-      })
-      console.log('fazendo login')
-      await actions.login(page)
-      console.log('entrando nas aulas')
-      await actions.seeClasses(page)
-      await actions.scheduleClasses(page)
-      await browser.close()
-      break
-    } catch (e) {
-      const { message } = e as Error
-      const errors = new Map<RegExp, string | (() => void)>([
-        [
-          /net::ERR_NAME_NOT_RESOLVED/,
-          'Não foi possível acessar o site, verifique sua conexão com a internet',
-        ],
-        [
-          /net::ERR_CONNECTION_TIMED_OUT|TimeoutError/,
-          'O site demorou demais para responder',
-        ],
-        [/net::ERR_NETWORK_CHANGED/, 'Houve uma alteração na rede'],
-      ])
-      // if the error is known, the user receives a custom message,
-      // else show the raw error is shown to the user
-      let knownError = false
-      for (const [regex, value] of errors) {
-        if (message.match(regex)) {
-          if (typeof value === 'string') {
-            console.log(value)
-          } else {
-            value()
-          }
-          knownError = true
-        }
-      }
-      if (!knownError) {
-        console.log('Ocorreu um erro:\n')
-        console.error(e)
-      }
-      for (let i = 5; i > 0; i--) {
-        process.stdout.write(`\rTentando novamente em ${i}`)
-        await delay(1000)
-      }
-      console.log('')
-    }
   }
+  const classWatcher = new ClassWatcher(launchOptions)
+  await classWatcher.launch()
+  classWatcher.onError((error, errorCase) => {
+    switch (errorCase) {
+      case 'browserDisconnected':
+        console.log(
+          'O navegador foi desconectado, por favor feche-o manualmente'
+        )
+        break
+      case 'networkChanged':
+        console.log('Houve uma alteração na rede')
+        break
+      case 'noInternet':
+        console.log('Sem conexão com a internet')
+        break
+      case 'pageTimeout':
+        console.log('A página excedeu o tempo de carregamento')
+        break
+      default:
+        console.log(error)
+        break
+    }
+  })
+  await classWatcher.start()
 }
 main()

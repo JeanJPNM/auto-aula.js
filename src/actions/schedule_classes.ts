@@ -13,14 +13,14 @@ export async function scheduleClasses(page: Page): Promise<void> {
     if (now > myClass.end) continue
     await waitUntil(myClass.start.getHours(), myClass.start.getMinutes())
     console.log('entrando...')
+    await page.reload()
     const loginButton = await page.$('button#login')
     // check if the class can be accessed
     if (loginButton) {
       await login(page)
       await seeClasses(page)
     }
-    await page.reload()
-    let currentHref = ''
+    let previousHref = ''
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const links = await page.$$('a.link-aula')
@@ -31,17 +31,16 @@ export async function scheduleClasses(page: Page): Promise<void> {
         } else {
           const { lab } = localData.get()
           link = links[lab]
-          if (lab === LabClass.bio) {
-            localData.set('lab', LabClass.info)
-          } else {
-            localData.set('lab', LabClass.bio)
-          }
+          localData.set(
+            'lab',
+            lab === LabClass.bio ? LabClass.info : LabClass.bio
+          )
         }
         const href = (await (
           await link.getProperty('href')
         ).jsonValue()) as string
-        if (currentHref !== href) {
-          currentHref = href
+        if (previousHref !== href) {
+          previousHref = href
           await Promise.all([
             link.click(),
             page.waitForNavigation({
