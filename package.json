@@ -21,6 +21,9 @@
   "homepage": "https://github.com/JeanJPNM/auto-aula-js#readme",
   "devDependencies": {
     "@types/puppeteer": "^5.4.2",
+    "@typescript-eslint/eslint-plugin": "^4.15.0",
+    "@typescript-eslint/parser": "^4.15.0",
+    "eslint": "^7.19.0",
     "rimraf": "^3.0.2",
     "ts-node-dev": "^1.1.1",
     "typescript": "^4.1.3"
