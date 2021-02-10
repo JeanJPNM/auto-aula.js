@@ -1,17 +1,18 @@
-import puppeteer, { errors, launch } from 'puppeteer'
 import * as actions from './actions'
 import localData, { dataFolder } from './local_data'
-import readline from 'readline'
-import path from 'path'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import chromePaths from 'chrome-paths'
 import { delay } from './util'
+import path from 'path'
+import puppeteer from 'puppeteer'
+import readline from 'readline'
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 })
 async function question(query: string): Promise<string> {
-  let answer: string = await new Promise((resolve) =>
+  const answer: string = await new Promise((resolve) =>
     rl.question(query, resolve)
   )
   return answer
@@ -35,12 +36,13 @@ async function main() {
         await watchClasses()
         break
       case 1:
-        const user: string = await question('Digite novo número de matrícula: ')
-        localData.set('user', user)
+        localData.set(
+          'user',
+          await question('Digite novo número de matrícula: ')
+        )
         break
       case 2:
-        const password: string = await question('Digite a nova senha: ')
-        localData.set('password', password)
+        localData.set('password', await question('Digite a nova senha: '))
         break
       default:
         console.log('Opção inválida')
@@ -60,6 +62,7 @@ async function watchClasses() {
     defaultViewport: null,
   })
   const page = await browser.newPage()
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     try {
       console.log('navegando para objetivo.br')
@@ -88,10 +91,10 @@ async function watchClasses() {
       ])
       // if the error is known, the user receives a custom message,
       // else show the raw error is shown to the user
-      let knownError: boolean = false
+      let knownError = false
       for (const [regex, value] of errors) {
         if (message.match(regex)) {
-          if (typeof value == 'string') {
+          if (typeof value === 'string') {
             console.log(value)
           } else {
             value()

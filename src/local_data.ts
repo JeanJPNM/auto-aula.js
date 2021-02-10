@@ -1,6 +1,6 @@
 import fs from 'fs'
-import path from 'path'
 import { holidays } from './dates'
+import path from 'path'
 export enum LabClass {
   bio,
   info,
@@ -20,13 +20,12 @@ function currentLab() {
     Math.floor(days / 7) -
     holidays.filter((date) => {
       const day = date.getDay()
-      return (day == 2 || day == 4) && date < now
+      return (day === 2 || day === 4) && date < now
     }).length
-  if (weeks % 2 == 0) {
+  if (weeks % 2 === 0) {
     return LabClass.info
-  } else {
-    return LabClass.bio
   }
+  return LabClass.bio
 }
 const defaultData: Data = {
   firstAccess: true,
@@ -36,32 +35,38 @@ export const dataFolder = path.join(process.env.APPDATA ?? './', 'auto-aula')
 const dataPath = path.join(dataFolder, 'data.json')
 class LocalData {
   private data: Data = defaultData
+
   constructor() {
     try {
-      let text = fs.readFileSync(dataPath, 'utf8')
+      const text = fs.readFileSync(dataPath, 'utf8')
       Object.assign(this.data, JSON.parse(text))
       this.set('firstAccess', false)
     } catch (error) {
       this.set('firstAccess', true)
     }
   }
+
   private save() {
     if (!fs.existsSync(dataPath)) {
       fs.mkdirSync(dataFolder)
     }
     fs.writeFileSync(dataPath, JSON.stringify(this.data, undefined, 2))
   }
+
   setAll(data: Partial<Data>) {
     Object.assign(this.data, data)
     this.save()
   }
+
   set<K extends keyof Data>(key: K, value: Data[K]) {
     this.data[key] = value
     this.save()
   }
+
   get(): Data {
     return { ...this.data }
   }
+
   dispose() {
     this.save()
   }

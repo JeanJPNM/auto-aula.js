@@ -1,17 +1,16 @@
-import { ElementHandle, Page } from 'puppeteer'
-import { seeClasses } from './actions'
-import localData, { LabClass } from './local_data'
-import { delay, waitUntil } from './util'
-
 class ScheduledClass {
   start: Date
+
   end: Date
+
   get hours() {
     return this.start.getHours()
   }
+
   get minutes() {
     return this.start.getMinutes()
   }
+
   constructor(hours: number, minutes: number) {
     this.start = new Date()
     this.start.setHours(hours, minutes)

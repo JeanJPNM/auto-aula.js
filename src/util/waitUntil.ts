@@ -1,6 +1,9 @@
 import delay from './delay'
 
-export default async function waitUntil(hours: number, minutes: number) {
+export default async function waitUntil(
+  hours: number,
+  minutes: number
+): Promise<void> {
   const now = new Date()
   const target = new Date(
     now.getFullYear(),
