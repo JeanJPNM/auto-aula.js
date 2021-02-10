@@ -1,7 +1,6 @@
-export async function delay(milliseconds: number) {
-  await new Promise((resolve) => setTimeout(resolve, milliseconds))
-}
-export async function waitUntil(hours: number, minutes: number) {
+import delay from './delay'
+
+export default async function waitUntil(hours: number, minutes: number) {
   const now = new Date()
   const target = new Date(
     now.getFullYear(),
