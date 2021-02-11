@@ -80,6 +80,9 @@ async function watchClasses() {
       case 'pageTimeout':
         message = 'A página excedeu o tempo de carregamento'
         break
+      case 'pageDisconnected':
+        message = 'A página foi desconectada'
+        break
       default:
         message = `Ocorreu um erro:\n${error}`
         break
