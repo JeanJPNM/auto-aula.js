@@ -4,6 +4,7 @@ import { LaunchOptions } from 'puppeteer'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import chromePaths from 'chrome-paths'
+import nodeNotifier from 'node-notifier'
 import path from 'path'
 import readline from 'readline'
 const rl = readline.createInterface({
@@ -63,25 +64,32 @@ async function watchClasses() {
   }
   const classWatcher = new ClassWatcher(launchOptions)
   await classWatcher.launch()
+  let lastMessage: string
   classWatcher.onError((error, errorCase) => {
+    let message: string
     switch (errorCase) {
       case 'browserDisconnected':
-        console.log(
-          'O navegador foi desconectado, por favor feche-o manualmente'
-        )
+        message = 'O navegador foi desconectado,  por favor reinicie o programa'
         break
       case 'networkChanged':
-        console.log('Houve uma alteração na rede')
+        message = 'Houve uma alteração na rede'
         break
       case 'noInternet':
-        console.log('Sem conexão com a internet')
+        message = 'Sem conexão com a internet'
         break
       case 'pageTimeout':
-        console.log('A página excedeu o tempo de carregamento')
+        message = 'A página excedeu o tempo de carregamento'
         break
       default:
-        console.log(error)
+        message = `Ocorreu um erro:\n${error}`
         break
+    }
+    if (lastMessage !== message) {
+      lastMessage = message
+      nodeNotifier.notify({
+        title: 'Auto Aula',
+        message,
+      })
     }
   })
   await classWatcher.start()
