@@ -1,7 +1,7 @@
-import { ElementHandle, Page } from 'puppeteer'
 import { delay, waitUntil } from '../util'
-import localData, { LabClass } from '../local_data'
+import { Page } from 'puppeteer'
 import classes from '../classes'
+import localData from '../local_data'
 import { login } from './login'
 import { seeClasses } from './see_classes'
 
@@ -25,28 +25,15 @@ export async function scheduleClasses(page: Page): Promise<void> {
     while (true) {
       const links = await page.$$('a.link-aula')
       if (links.length > 0) {
-        let link: ElementHandle<Element>
-        if (links.length === 1) {
-          ;[link] = links
-        } else {
-          const { lab } = localData.get()
-          link = links[lab]
-          localData.set(
-            'lab',
-            lab === LabClass.bio ? LabClass.info : LabClass.bio
-          )
-        }
+        const { lab } = localData.get()
+        const index = links.length > 1 ? lab : 0
+        const link = links[index]
         const href = (await (
           await link.getProperty('href')
         ).jsonValue()) as string
         if (previousHref !== href) {
           previousHref = href
-          await Promise.all([
-            link.click(),
-            page.waitForNavigation({
-              timeout: 300000,
-            }),
-          ])
+          await Promise.all([link.click(), page.waitForNavigation()])
           await page.waitForSelector('div[role=button]')
           await page.click('div[role=button]')
           await delay(10000)

@@ -43,6 +43,8 @@ class LocalData {
       this.set('firstAccess', false)
     } catch (error) {
       this.set('firstAccess', true)
+    } finally {
+      this.data.lab = currentLab()
     }
   }
 
