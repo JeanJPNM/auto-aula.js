@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/JeanJPNM/auto-aula-js#readme",
   "devDependencies": {
+    "@types/node-notifier": "^8.0.0",
     "@types/puppeteer": "^5.4.2",
     "@typescript-eslint/eslint-plugin": "^4.15.0",
     "@typescript-eslint/parser": "^4.15.0",
@@ -33,6 +34,7 @@
   },
   "dependencies": {
     "chrome-paths": "^1.0.1",
+    "node-notifier": "^9.0.0",
     "puppeteer": "^5.5.0"
   }
 }
