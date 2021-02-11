@@ -6,6 +6,7 @@ const errorCases = {
   pageTimeout: /net::ERR_CONNECTION_TIMED_OUT|TimeoutError/,
   networkChanged: /net::ERR_NETWORK_CHANGED/,
   browserDisconnected: /Navigation failed because browser has disconnected/,
+  pageDisconnected: /ProtocolError/,
 }
 type ErrorCase = keyof typeof errorCases | 'unknown'
 type Listener = (error: Error, errorCase: ErrorCase) => void | Promise<void>
@@ -46,8 +47,8 @@ export default class ClassWatcher {
       } catch (error) {
         const { message } = error as Error
         if (message.match(errorCases.browserDisconnected)) {
-          await this.resetAll()
           this.notifyListeners(error, 'browserDisconnected')
+          await this.resetAll()
         } else if (message.match(errorCases.networkChanged)) {
           await this.resetPage()
           this.notifyListeners(error, 'networkChanged')
@@ -57,6 +58,9 @@ export default class ClassWatcher {
         } else if (message.match(errorCases.pageTimeout)) {
           await this.resetPage()
           this.notifyListeners(error, 'pageTimeout')
+        } else if (message.match(errorCases.pageDisconnected)) {
+          await this.resetPage()
+          this.notifyListeners(error, 'pageDisconnected')
         } else {
           this.notifyListeners(error, 'unknown')
         }
@@ -73,7 +77,12 @@ export default class ClassWatcher {
   }
 
   private async resetAll(): Promise<void> {
+    function giveUp() {
+      process.exit(1)
+    }
+    const timeout = setTimeout(giveUp, 5000)
     await this.browser?.close()
+    clearTimeout(timeout)
     await this.launch()
   }
 
