@@ -1,5 +1,12 @@
 import * as actions from './actions'
-import { Browser, LaunchOptions, Page, launch } from 'puppeteer'
+import {
+  Browser,
+  ChromeArgOptions,
+  LaunchOptions,
+  Page,
+  Product,
+  launch,
+} from 'puppeteer'
 import { delay } from './util'
 const errorCases = {
   noInternet: /net::ERR_NAME_NOT_RESOLVED/,
@@ -8,6 +15,13 @@ const errorCases = {
   browserDisconnected: /Navigation failed because browser has disconnected/,
   pageDisconnected: /ProtocolError/,
 }
+export type ClassWatcherOptions = LaunchOptions &
+  ChromeArgOptions & {
+    product?: Product
+    extraPrefsFirefox?: Record<string, unknown>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    defaultViewport?: any
+  }
 type ErrorCase = keyof typeof errorCases | 'unknown'
 type Listener = (error: Error, errorCase: ErrorCase) => void | Promise<void>
 type ListenerSubscription = {
@@ -21,7 +35,7 @@ export default class ClassWatcher {
 
   private readonly errorListeners: Listener[] = []
 
-  constructor(public readonly launchOptions: LaunchOptions) {}
+  constructor(public readonly launchOptions: ClassWatcherOptions) {}
 
   async launch(): Promise<void> {
     this.browser = await launch(this.launchOptions)

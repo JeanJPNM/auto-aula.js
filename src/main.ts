@@ -1,6 +1,5 @@
+import ClassWatcher, { ClassWatcherOptions } from './class_watcher'
 import localData, { dataFolder } from './local_data'
-import ClassWatcher from './class_watcher'
-import { LaunchOptions } from 'puppeteer'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import chromePaths from 'chrome-paths'
@@ -56,7 +55,7 @@ async function main() {
 }
 async function watchClasses() {
   console.log('iniciando')
-  const launchOptions: LaunchOptions = {
+  const launchOptions: ClassWatcherOptions = {
     headless: false,
     userDataDir: path.join(dataFolder, 'puppeteerData'),
     executablePath: chromePaths.chrome,
