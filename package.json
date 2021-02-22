@@ -5,23 +5,23 @@
   "main": "main.js",
   "scripts": {
     "start": "ts-node-dev --transpile-only src/main.ts",
-    "build": "rimraf bin && tsc",
-    "run": "tsc && node bin/main.js",
-    "compile": "npm run build && nexe bin/main.js -o build/auto-aula && nexe bin/main.js -t win32-x86 -o build/auto-aula-x86"
+    "build": "rimraf build && tsc",
+    "run": "tsc && node build/main.js",
+    "compile": "npm run build && .\\compile.ps1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JeanJPNM/auto-aula-js.git"
+    "url": "git+https://github.com/JeanJPNM/auto-aula.js.git"
   },
   "author": "JeanJPNM",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/JeanJPNM/auto-aula-js/issues"
+    "url": "https://github.com/JeanJPNM/auto-aula.js/issues"
   },
-  "homepage": "https://github.com/JeanJPNM/auto-aula-js#readme",
+  "homepage": "https://github.com/JeanJPNM/auto-aula.js#readme",
   "devDependencies": {
     "@types/node-notifier": "^8.0.0",
-    "@types/puppeteer": "^5.4.2",
+    "@types/puppeteer": "^5.4.3",
     "@typescript-eslint/eslint-plugin": "^4.15.0",
     "@typescript-eslint/parser": "^4.15.0",
     "eslint": "^7.19.0",
@@ -35,6 +35,6 @@
   "dependencies": {
     "chrome-paths": "^1.0.1",
     "node-notifier": "^9.0.0",
-    "puppeteer": "^5.5.0"
+    "puppeteer": "^7.1.0"
   }
 }
