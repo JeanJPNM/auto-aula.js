@@ -28,9 +28,11 @@ export async function scheduleClasses(page: Page): Promise<void> {
         const { lab } = localData.get()
         const index = links.length > 1 ? lab : 0
         const link = links[index]
-        const href = (await (
-          await link.getProperty('href')
-        ).jsonValue()) as string
+        const href = await (async () => {
+          const prop = await link.getProperty('href')
+          if (prop === undefined) return ''
+          return (await prop.jsonValue()) as string
+        })()
         if (previousHref !== href) {
           previousHref = href
           await Promise.all([link.click(), page.waitForNavigation()])
