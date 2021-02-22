@@ -3,4 +3,4 @@ node_modules/
 puppeteerData/
 data.json
 bin/
-*.exe
+build/
